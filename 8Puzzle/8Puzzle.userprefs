@@ -1,0 +1,16 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\BFSearch.cs">
+    <Files>
+      <File FileName="Assets\AStarHeuristic.cs" Line="30" Column="29" />
+      <File FileName="Assets\Script.cs" Line="16" Column="2" />
+      <File FileName="Assets\BFSearch.cs" Line="9" Column="36" />
+      <File FileName="Assets\UI.cs" Line="37" Column="5" />
+      <File FileName="Assets\PuzzleState.cs" Line="27" Column="24" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
