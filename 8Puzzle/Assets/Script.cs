@@ -73,6 +73,7 @@ public class Script : MonoBehaviour {
 	public IEnumerator AStarSolve(){
 		AStarHeuristic aStar = new AStarHeuristic(state_);
 
+
 		List<Move> moveList = aStar.GetMoveList(aStar.Solve());
 
 		foreach(Move move in moveList){
@@ -83,6 +84,10 @@ public class Script : MonoBehaviour {
 			yield return new WaitForSeconds(0.2f);
 			//yield return null;
 		}
+
+
+		//yield return null;
+
 	}
 
 	public IEnumerator SlowShuffle(){
@@ -121,6 +126,8 @@ public class Script : MonoBehaviour {
 		nullPosition = p;
 
 		state_ = state_.Move(piece);
+
+		Debug.Log (AStarHeuristic.GetNumberOutOfPlaceHeuristic(state_));
 
 	}
 

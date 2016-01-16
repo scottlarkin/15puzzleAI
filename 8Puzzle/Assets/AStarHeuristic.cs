@@ -3,23 +3,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+public class DuplicateKeyComparer<TKey>: IComparer<TKey> where TKey : IComparable
+{
+	
+	public int Compare(TKey x, TKey y)
+	{
+		int result = x.CompareTo(y);
+		
+		return result == 0 ? 1 : result;
+	}
+}
+
 public class AStarHeuristic {
 
-	public class DuplicateKeyComparer<TKey>: IComparer<TKey> where TKey : IComparable
-	{
-		
-		public int Compare(TKey x, TKey y)
-		{
-			int result = x.CompareTo(y);
-			
-			if (result == 0)
-				return 1; 
-			else
-				return result;
-		}
-		
-	}
-
+	
 	public class Node{
 
 		public Node(){
@@ -40,15 +37,21 @@ public class AStarHeuristic {
 			Node n = (Node)obj;
 			return state_.Equals(n.state_);
 		}
+
+		public override int GetHashCode() { 
+			int hc = state_.GetHashCode();
+			return hc;
+		}
+	
 	}
 
-	HashSet<PuzzleState> closedSet_;
+	Dictionary<Node, Node> closedSet_;
 	SortedList<int, Node> openSet_;
 	
 	public AStarHeuristic(PuzzleState baseState){
 
 		openSet_ = new SortedList<int, Node>(new DuplicateKeyComparer<int>());
-		closedSet_ = new HashSet<PuzzleState>();
+		closedSet_ = new Dictionary<Node,Node>();
 
 		Node baseNode = new Node();
 
@@ -83,29 +86,45 @@ public class AStarHeuristic {
 			}
 			
 			openSet_.RemoveAt(0);
-			closedSet_.Add(current.state_);
+			closedSet_.Add(current, current);
 			
 			foreach(Move move in current.state_.GetMoveablePieces()){
 				
 				PuzzleState state = current.state_.Move(move);
-				
-				if(closedSet_.Contains(state))
-					continue;
-				
+
 				int gScore = current.gScore_ + 1; //1 is always the move cost for the puzzle game
-				
+
 				Node newNode = new Node();
 				newNode.gScore_ = gScore;
 				newNode.state_ = state;
 				newNode.move_ = move;
 				newNode.parent_ = current;
-								
-				if(!openSet_.ContainsValue(newNode) || !closedSet_.Contains(newNode.state_)){
-					openSet_.Add(newNode.FScore(), newNode);
-				}
-				
-			}
 
+				if(!closedSet_.ContainsKey(newNode) && !openSet_.ContainsValue(newNode)){
+
+					openSet_.Add(newNode.FScore(), newNode);
+
+				}else if(openSet_.ContainsValue(newNode)){
+
+					Node n = openSet_.Values[openSet_.IndexOfValue(newNode)];
+
+					if(newNode.gScore_ < n.gScore_){
+		
+						openSet_.RemoveAt(openSet_.IndexOfValue(n));
+						openSet_.Add(n.FScore(), n);
+					}
+
+				}else if(closedSet_.ContainsKey(newNode)){
+
+					Node n = closedSet_[newNode];
+
+					if(newNode.gScore_ < n.gScore_){
+
+						closedSet_.Remove(newNode);
+						openSet_.Add(newNode.FScore(), newNode);
+					}
+				}
+			}
 		}
 
 		return baseN;
@@ -139,9 +158,24 @@ public class AStarHeuristic {
 		return ret;
 		
 	}
-	
+
+
+	public static int GetNumberOutOfPlaceHeuristic(PuzzleState state){
+
+		int h = 0;
+
+		for(int i = 0; i < state.numbers_.Length; i++)
+			if(i != -1)
+				if(i + 1 != state.numbers_[i])
+					h++;
+
+		return h;
+
+	}
+
 	public static int GetManhattanHeuristic(PuzzleState state){
 
+		//gotta be a better way of doing this!
 		short[,] nums = state.NumbersMappedTo2D();
 		short[,] terminalNums = PuzzleState.terminalState_.NumbersMappedTo2D();
 		int h = 0;
